@@ -7,8 +7,9 @@ import (
 )
 
 type User struct {
-	Id   uuid.UUID
-	Name string
+	Id    uuid.UUID
+	Name  string
+	Email string
 }
 
 type Resource struct {
@@ -17,6 +18,11 @@ type Resource struct {
 }
 
 type Group struct {
+	Id   uuid.UUID
+	Name string
+}
+
+type Project struct {
 	Id   uuid.UUID
 	Name string
 }
@@ -31,6 +37,10 @@ func (u User) GetId() string {
 
 func (r Resource) GetId() string {
 	return r.Id.String()
+}
+
+func (p Project) GetId() string {
+	return p.Id.String()
 }
 
 func getType(i interface{}) string {
