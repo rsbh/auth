@@ -14,7 +14,7 @@ func TestRules(t *testing.T) {
 		g := utils.NewGroup()
 		r := utils.NewResource()
 		ok, err := e.AddPolicy(g.GetId(), r.GetId(), "*", "*")
-		assert.Equal(t, ok, true)
+		assert.Equal(t, true, ok)
 		assert.NoError(t, err)
 		e.ClearPolicy()
 	})
@@ -24,7 +24,7 @@ func TestRules(t *testing.T) {
 		r := utils.NewResource()
 		p := utils.NewProject()
 		ok, err := e.AddPolicy(g.GetId(), r.GetId(), p.GetId(), "*")
-		assert.Equal(t, ok, true)
+		assert.Equal(t, true, ok)
 		assert.NoError(t, err)
 		e.ClearPolicy()
 	})
@@ -36,7 +36,7 @@ func TestRules(t *testing.T) {
 		p := utils.NewProject()
 		e.AddPolicy(g.GetId(), r.GetId(), p.GetId(), "*")
 		ok, err := e.AddRoleForUserInDomain(u.GetId(), g.GetId(), p.GetId())
-		assert.Equal(t, ok, true)
+		assert.Equal(t, true, ok)
 		assert.NoError(t, err)
 		e.ClearPolicy()
 	})
@@ -47,7 +47,7 @@ func TestRules(t *testing.T) {
 		p := utils.NewProject()
 		e.AddPolicy("", "", "", "*")
 		ok, err := e.Enforce(g.GetId(), r.GetId(), p.GetId(), "*")
-		assert.Equal(t, ok, false)
+		assert.Equal(t, false, ok)
 		assert.NoError(t, err)
 		e.ClearPolicy()
 	})
@@ -58,7 +58,67 @@ func TestRules(t *testing.T) {
 		p := utils.NewProject()
 		e.AddPolicy(g.GetId(), r.GetId(), p.GetId(), "*")
 		ok, err := e.Enforce(g.GetId(), r.GetId(), p.GetId(), "*")
-		assert.Equal(t, ok, true)
+		assert.Equal(t, true, ok)
+		assert.NoError(t, err)
+		e.ClearPolicy()
+	})
+
+	t.Run("Return false if user doesnt belong to resource group", func(t *testing.T) {
+		g := utils.NewGroup()
+		r := utils.NewResource()
+		p := utils.NewProject()
+		u := utils.NewUser()
+
+		e.AddPolicy(g.GetId(), r.GetId(), p.GetId(), "*")
+
+		ok, err := e.Enforce(u.GetId(), r.GetId(), p.GetId(), "*")
+		assert.Equal(t, false, ok)
+		assert.NoError(t, err)
+		e.ClearPolicy()
+	})
+
+	t.Run("Return true if user belong to resource group", func(t *testing.T) {
+		g := utils.NewGroup()
+		r := utils.NewResource()
+		p := utils.NewProject()
+		u := utils.NewUser()
+
+		e.AddPolicy(g.GetId(), r.GetId(), p.GetId(), "*")
+		e.AddRoleForUserInDomain(u.GetId(), g.GetId(), p.GetId())
+
+		ok, err := e.Enforce(u.GetId(), r.GetId(), p.GetId(), "*")
+		assert.Equal(t, true, ok)
+		assert.NoError(t, err)
+		e.ClearPolicy()
+	})
+
+	t.Run("Return false if user belong to group but domain is not same", func(t *testing.T) {
+		g := utils.NewGroup()
+		r := utils.NewResource()
+		u := utils.NewUser()
+		p1 := utils.NewProject()
+		p2 := utils.NewProject()
+
+		e.AddPolicy(g.GetId(), r.GetId(), p1.GetId(), "*")
+		e.AddRoleForUserInDomain(u.GetId(), g.GetId(), p2.GetId())
+
+		ok, err := e.Enforce(u.GetId(), r.GetId(), p1.GetId(), "*")
+		assert.Equal(t, false, ok)
+		assert.NoError(t, err)
+		e.ClearPolicy()
+	})
+
+	t.Run("Return true if user belong to group in all group", func(t *testing.T) {
+		g := utils.NewGroup()
+		r := utils.NewResource()
+		u := utils.NewUser()
+		p1 := utils.NewProject()
+
+		e.AddPolicy(g.GetId(), r.GetId(), p1.GetId(), "*")
+		e.AddRoleForUserInDomain(u.GetId(), g.GetId(), "*")
+
+		ok, err := e.Enforce(u.GetId(), r.GetId(), p1.GetId(), "*")
+		assert.Equal(t, true, ok)
 		assert.NoError(t, err)
 		e.ClearPolicy()
 	})
