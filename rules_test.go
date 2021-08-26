@@ -13,18 +13,18 @@ func TestRules(t *testing.T) {
 	t.Run("Should Create a Policy", func(t *testing.T) {
 		g := utils.NewGroup()
 		r := utils.NewResource()
-		ok, err := e.AddPolicy(g.GetId(), r.GetId(), "*")
+		ok, err := e.AddPolicy(utils.CreateUrn(g), utils.CreateUrn(r), "*")
 		assert.Equal(t, true, ok)
 		assert.NoError(t, err)
-		e.ClearPolicy()
+		// e.ClearPolicy()
 	})
 
 	t.Run("Should Map a User with Group", func(t *testing.T) {
 		g := utils.NewGroup()
 		r := utils.NewResource()
 		u := utils.NewUser()
-		e.AddPolicy(g.GetId(), r.GetId(), "*")
-		ok, err := e.AddRoleForUser(u.GetId(), g.GetId())
+		e.AddPolicy(utils.CreateUrn(g), utils.CreateUrn(r), "*")
+		ok, err := e.AddRoleForUser(utils.CreateUrn(u), utils.CreateUrn(g))
 		assert.Equal(t, true, ok)
 		assert.NoError(t, err)
 		e.ClearPolicy()
@@ -34,7 +34,7 @@ func TestRules(t *testing.T) {
 		g := utils.NewGroup()
 		r := utils.NewResource()
 		e.AddPolicy("", "", "*")
-		ok, err := e.Enforce(g.GetId(), r.GetId(), "*")
+		ok, err := e.Enforce(utils.CreateUrn(g), utils.CreateUrn(r), "*")
 		assert.Equal(t, false, ok)
 		assert.NoError(t, err)
 		e.ClearPolicy()
@@ -43,8 +43,8 @@ func TestRules(t *testing.T) {
 	t.Run("Check if group has resource permission", func(t *testing.T) {
 		g := utils.NewGroup()
 		r := utils.NewResource()
-		e.AddPolicy(g.GetId(), r.GetId(), "*")
-		ok, err := e.Enforce(g.GetId(), r.GetId(), "*")
+		e.AddPolicy(utils.CreateUrn(g), utils.CreateUrn(r), "*")
+		ok, err := e.Enforce(utils.CreateUrn(g), utils.CreateUrn(r), "*")
 		assert.Equal(t, true, ok)
 		assert.NoError(t, err)
 		e.ClearPolicy()
@@ -55,9 +55,9 @@ func TestRules(t *testing.T) {
 		r := utils.NewResource()
 		u := utils.NewUser()
 
-		e.AddPolicy(g.GetId(), r.GetId(), "*")
+		e.AddPolicy(utils.CreateUrn(g), utils.CreateUrn(r), "*")
 
-		ok, err := e.Enforce(u.GetId(), r.GetId(), "*")
+		ok, err := e.Enforce(utils.CreateUrn(u), utils.CreateUrn(r), "*")
 		assert.Equal(t, false, ok)
 		assert.NoError(t, err)
 		e.ClearPolicy()
@@ -66,13 +66,12 @@ func TestRules(t *testing.T) {
 	t.Run("Return true if user belong to resource group", func(t *testing.T) {
 		g := utils.NewGroup()
 		r := utils.NewResource()
-
 		u := utils.NewUser()
 
-		e.AddPolicy(g.GetId(), r.GetId(), "*")
-		e.AddRoleForUser(u.GetId(), g.GetId())
+		e.AddPolicy(utils.CreateUrn(g), utils.CreateUrn(r), "*")
+		e.AddRoleForUser(utils.CreateUrn(u), utils.CreateUrn(g))
 
-		ok, err := e.Enforce(u.GetId(), r.GetId(), "*")
+		ok, err := e.Enforce(utils.CreateUrn(u), utils.CreateUrn(r), "*")
 		assert.Equal(t, true, ok)
 		assert.NoError(t, err)
 		e.ClearPolicy()

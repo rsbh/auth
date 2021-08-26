@@ -32,3 +32,16 @@ func NewGroup() models.Group {
 func NewProject() models.Project {
 	return models.Project{Id: uuid.New(), Name: gofakeit.Name()}
 }
+
+type Item interface {
+	GetId() string
+	GetType() string
+}
+
+func CreateUrn(items ...Item) string {
+	var urn string
+	for _, item := range items {
+		urn += "/" + item.GetType() + "/" + item.GetId()
+	}
+	return urn
+}

@@ -1,8 +1,6 @@
 package models
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
 )
 
@@ -43,22 +41,18 @@ func (p Project) GetId() string {
 	return p.Id.String()
 }
 
-func getType(i interface{}) string {
-	switch i.(type) {
-	case User:
-		return "user"
-	case Resource:
-		return "resource"
-	case Group:
-		return "group"
-	default:
-		return ""
-	}
+func (g Group) GetType() string {
+	return "group"
 }
 
-func GetRelation(i interface{}, j interface{}) string {
-	itype := getType(i)
-	jtype := getType(j)
+func (u User) GetType() string {
+	return "user"
+}
 
-	return fmt.Sprintf("%s:%s", itype, jtype)
+func (r Resource) GetType() string {
+	return "resource"
+}
+
+func (p Project) GetType() string {
+	return "project"
 }
