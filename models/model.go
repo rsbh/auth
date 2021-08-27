@@ -25,6 +25,11 @@ type Project struct {
 	Name string
 }
 
+type Role struct {
+	Id   uuid.UUID
+	Name string
+}
+
 type WildCard struct {
 	Id   string
 	Type string
@@ -46,6 +51,10 @@ func (p Project) GetId() string {
 	return p.Id.String()
 }
 
+func (r Role) GetId() string {
+	return r.Id.String()
+}
+
 func (w WildCard) GetId() string {
 	return "*"
 }
@@ -64,6 +73,10 @@ func (r Resource) GetType() string {
 
 func (p Project) GetType() string {
 	return "project"
+}
+
+func (r Role) GetType() string {
+	return "role"
 }
 
 func (w WildCard) GetType() string {

@@ -33,6 +33,10 @@ func NewProject() models.Project {
 	return models.Project{Id: uuid.New(), Name: gofakeit.Name()}
 }
 
+func NewRole() models.Role {
+	return models.Role{Id: uuid.New(), Name: gofakeit.Name()}
+}
+
 func NewWildCard(item Item) models.WildCard {
 	return models.WildCard{Type: item.GetType()}
 }

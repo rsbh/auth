@@ -134,4 +134,65 @@ func TestRules(t *testing.T) {
 		e.ClearPolicy()
 	})
 
+	t.Run("Return true if user is assigned to role with access", func(t *testing.T) {
+		g := utils.NewGroup()
+		r := utils.NewResource()
+		u := utils.NewUser()
+		p := utils.NewProject()
+		role := utils.NewRole()
+
+		action := "read"
+
+		w := utils.NewWildCard(p)
+		e.AddNamedGroupingPolicy("g2", action, utils.CreateUrn(role))
+		e.AddPolicy(utils.CreateUrn(g), utils.CreateUrn(w), utils.CreateUrn(role))
+		e.AddRoleForUser(utils.CreateUrn(u), utils.CreateUrn(g))
+
+		ok, err := e.Enforce(utils.CreateUrn(u), utils.CreateUrn(p, r), action)
+		assert.Equal(t, true, ok)
+		assert.NoError(t, err)
+		e.ClearPolicy()
+	})
+
+	t.Run("Return false if user is assigned to role without access", func(t *testing.T) {
+		g := utils.NewGroup()
+		r := utils.NewResource()
+		u := utils.NewUser()
+		p := utils.NewProject()
+		role1 := utils.NewRole()
+		role2 := utils.NewRole()
+
+		action := "read"
+
+		w := utils.NewWildCard(p)
+		e.AddNamedGroupingPolicy("g2", action, utils.CreateUrn(role1))
+		e.AddPolicy(utils.CreateUrn(g), utils.CreateUrn(w), utils.CreateUrn(role2))
+		e.AddRoleForUser(utils.CreateUrn(u), utils.CreateUrn(g))
+
+		ok, err := e.Enforce(utils.CreateUrn(u), utils.CreateUrn(p, r), action)
+		assert.Equal(t, false, ok)
+		assert.NoError(t, err)
+		e.ClearPolicy()
+	})
+
+	t.Run("Return false if user role action doest match", func(t *testing.T) {
+		g := utils.NewGroup()
+		r := utils.NewResource()
+		u := utils.NewUser()
+		p := utils.NewProject()
+		role := utils.NewRole()
+
+		action := "read"
+
+		w := utils.NewWildCard(p)
+		e.AddNamedGroupingPolicy("g2", action, utils.CreateUrn(role))
+		e.AddPolicy(utils.CreateUrn(g), utils.CreateUrn(w), utils.CreateUrn(role))
+		e.AddRoleForUser(utils.CreateUrn(u), utils.CreateUrn(g))
+
+		ok, err := e.Enforce(utils.CreateUrn(u), utils.CreateUrn(p, r), "write")
+		assert.Equal(t, false, ok)
+		assert.NoError(t, err)
+		e.ClearPolicy()
+	})
+
 }
